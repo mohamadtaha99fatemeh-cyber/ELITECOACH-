@@ -1,0 +1,43 @@
+name: Android Build for Mamad
+
+on:
+  push:
+    branches: [ "اصلی" ]
+  pull_request:
+    branches: [ "اصلی" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 1. تنظیم محیط جاوا
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'gradle'
+
+    # 2. نصب ابزارهای لازم SDK (در صورت نیاز)
+    - name: Install Android SDK components
+      uses: actions/setup-android-sdk@v3
+      with:
+        sdk-manager-packages: 'platform-tools'
+
+    # 3. اجرای تست‌ها (اختیاری اما توصیه شده)
+    - name: Run Gradle tests
+      run: ./gradlew test
+
+    # 4. ساخت APK (Debug)
+    - name: Build Android App (Debug)
+      run: ./gradlew assembleDebug
+
+    # 5. آپلود فایل خروجی (این مرحله مشکل شما را حل خواهد کرد)
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug-artifact # نامی که در صفحه Actions ظاهر می‌شود
+        path: app/build/outputs/apk/debug/app-debug.apk # مسیر استاندارد فایل خروجی
